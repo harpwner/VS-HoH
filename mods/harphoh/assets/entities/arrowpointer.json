@@ -1,0 +1,11 @@
+﻿{
+    "code": "arrowpointer",
+    "class": "EntityPointer",
+    "client": {
+        "renderer": "Shape",
+        "shape": { "base": "entity/arrow" }
+    },
+    "sounds": {
+        "hurt": "player/slap"
+    }
+}
