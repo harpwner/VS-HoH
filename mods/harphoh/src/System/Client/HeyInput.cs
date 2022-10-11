@@ -10,12 +10,16 @@ namespace harphoh.src.System.Client
     {
         ICoreAPI api;
         IClientPlayer Player => (api as ICoreClientAPI).World.Player;
+
+        HeySystem system;
         const GlKeys heyKey = GlKeys.Minus;
         const float range = 64;
 
-        public HeyInput(ICoreAPI api, HeySystem modSys)
+        public HeyInput(ICoreAPI api, HeySystem system)
         {
             this.api = api;
+            this.system = system;
+
             if(this.api == null || api.Side != EnumAppSide.Client)
             {
                 return;
@@ -25,14 +29,6 @@ namespace harphoh.src.System.Client
 
             capi.Input.RegisterHotKey("heyoverhere", "Hey! Over Here!", heyKey);
             capi.Input.SetHotKeyHandler("heyoverhere", HeyOverHere);
-        }
-
-        public AssetLocation AssetTest()
-        {
-            var asset = AssetLocation.Create("harphoh:entities/arrowpointer");
-            api.Logger.Audit("Asset Found: {0}", asset != null);
-            api.Logger.Audit(asset?.Path);
-            return asset;
         }
 
         bool HeyOverHere(KeyCombination k)
@@ -48,19 +44,7 @@ namespace harphoh.src.System.Client
 
             api.Logger.Chat("Position: (" + selectTrue.X + ", " + selectTrue.Y + ", " + selectTrue.Z + ")");
 
-            AssetLocation asset = AssetTest();
-
-            EntityProperties type = api.World.GetEntityType(asset);
-
-            Entity entity = api.World.ClassRegistry.CreateEntity(type);
-
-            if(entity != null)
-            {
-                entity.ServerPos = new EntityPos(selectTrue.X, selectTrue.Y, selectTrue.Z);
-                entity.Pos.SetFrom(entity.ServerPos);
-
-                api.World.SpawnEntity(entity);
-            }
+            system.SpawnArrow(selectTrue);
 
             return true;
         }
