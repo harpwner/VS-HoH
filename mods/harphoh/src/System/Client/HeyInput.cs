@@ -10,7 +10,6 @@ namespace harphoh.src.System.Client
     {
         ICoreAPI api;
         IClientPlayer Player => (api as ICoreClientAPI).World.Player;
-
         HeySystem system;
         const GlKeys heyKey = GlKeys.Minus;
         const float range = 64;
@@ -44,7 +43,7 @@ namespace harphoh.src.System.Client
 
             api.Logger.Chat("Position: (" + selectTrue.X + ", " + selectTrue.Y + ", " + selectTrue.Z + ")");
 
-            system.SpawnArrow(selectTrue);
+            system.SendPacket(selectTrue);
 
             return true;
         }

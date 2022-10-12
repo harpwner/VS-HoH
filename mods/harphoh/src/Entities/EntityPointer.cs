@@ -12,7 +12,6 @@ namespace harphoh.src.Entities
     class EntityPointer : Entity
     {
         const float decayTime = 10;
-        Vec3d suppliedPos;
         float timeAlive = 0;
         public override bool IsInteractable => false;
         public override bool ShouldDespawn => ShouldTerminate();
@@ -20,11 +19,6 @@ namespace harphoh.src.Entities
         bool ShouldTerminate()
         {
             return timeAlive >= decayTime;
-        }
-
-        public EntityPointer(Vec3d pos)
-        {
-            this.suppliedPos = pos;
         }
 
         public override void Initialize(EntityProperties properties, ICoreAPI api, long InChunkIndex3d)
