@@ -69,6 +69,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="src\Entities\EntityPointer.cs" />
+    <Compile Include="src\Renderer\OutlineRenderer.cs" />
     <Compile Include="src\Renderer\PointerRenderer.cs" />
     <Compile Include="src\System\Client\HeyInput.cs" />
     <Compile Include="src\System\HeySystem.cs" />

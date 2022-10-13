@@ -1,5 +1,6 @@
 ﻿using harphoh.src.Entities;
 using harphoh.src.System.Client;
+using harphoh.src.Renderer;
 using ProtoBuf;
 using System;
 using System.Collections.Generic;
@@ -42,7 +43,24 @@ namespace harphoh.src.System
             this.capi = api;
 
             clientChannel = capi.Network.RegisterChannel("heyoverhere")
-                .RegisterMessageType(typeof(HeyOverHereMessage));
+                .RegisterMessageType(typeof(HeyOverHereMessage))
+                .RegisterMessageType(typeof(HeyOverHereSender))
+                .SetMessageHandler<HeyOverHereMessage>(SpawnArrow);
+        }
+
+        MeshData GetMesh(string type)
+        {
+            Block block = api.World.BlockAccessor.GetBlock(new AssetLocation("game:mantle"));
+            if (block.BlockId == 0) return null;
+
+            MeshData mesh;
+            ITesselatorAPI mesher = ((ICoreClientAPI)api).Tesselator;
+
+            Shape shape = Shape.TryGet(api, "harphoh:shapes/" + type + ".json");
+
+            mesher.TesselateShape(block, shape, out mesh);
+
+            return mesh;
         }
 
         public override void StartServerSide(ICoreServerAPI api)
@@ -53,38 +71,50 @@ namespace harphoh.src.System
 
             serverChannel = sapi.Network.RegisterChannel("heyoverhere")
                 .RegisterMessageType(typeof(HeyOverHereMessage))
-                .SetMessageHandler<HeyOverHereMessage>(SpawnArrow);
+                .RegisterMessageType(typeof(HeyOverHereSender))
+                .SetMessageHandler<HeyOverHereSender>(SendToPlayers);
         }
 
-        public void SendPacket(Vec3d inputPos)
+        public void SendPacket(Vec3d playerPos, float pitch, float yaw, bool isBlockMarker = false)
         {
             if(api.Side != EnumAppSide.Client) { return; }
 
             api.Logger.Chat("Sending message");
-            HeyOverHereMessage message = new HeyOverHereMessage() { position = inputPos };
+            HeyOverHereSender message = new HeyOverHereSender() { playerPosition = playerPos, pitch = pitch, yaw = yaw, isBlockMarker = isBlockMarker };
             clientChannel.SendPacket(message);
         }
 
-        void SpawnArrow(IPlayer player, HeyOverHereMessage packet)
+        void SendToPlayers(IPlayer player, HeyOverHereSender packet)
         {
             if (api.Side != EnumAppSide.Server) { return; }
 
-            Vec3d position = packet.position;
+            api.Logger.Chat("Server Receieved Message! Forming HoH Packet");
 
-            //AssetLocation asset = new AssetLocation("harphoh:entities/arrowpointer");
+            BlockSelection bSelection = new BlockSelection();
+            EntitySelection eSelection = new EntitySelection();
 
-            EntityProperties type = api.World.GetEntityType(new AssetLocation("harphoh:arrowpointer"));
+            sapi.World.RayTraceForSelection(packet.playerPosition, -packet.pitch, packet.yaw, 64, ref bSelection, ref eSelection);
 
-            Entity entity = api.ClassRegistry.CreateEntity(type);
+            if(bSelection == null) { return; }
 
-            api.Logger.Chat("Hi");
+            HeyOverHereMessage clientPacket = new HeyOverHereMessage() { position = bSelection.Position.ToVec3d(), isBlockMarker = packet.isBlockMarker };
 
-            if (entity != null)
+            serverChannel.BroadcastPacket(clientPacket);
+        }
+
+        void SpawnArrow(HeyOverHereMessage packet)
+        {
+            if(api.Side != EnumAppSide.Client) { return; }
+            api.Logger.Chat("Packet Receieved From Server, Spawning HoH Arrow!");
+
+            if (packet.isBlockMarker)
             {
-                entity.ServerPos = new EntityPos(position.X, position.Y, position.Z);
-                entity.Pos.SetFrom(entity.ServerPos);
-
-                api.World.SpawnEntity(entity);
+                capi.Event.RegisterRenderer(new OutlineRenderer(api as ICoreClientAPI, packet.position, GetMesh("outline")), EnumRenderStage.AfterBlit);
+            }
+            else
+            {
+                capi.Event.RegisterRenderer(new PointerRenderer(api as ICoreClientAPI, packet.position, GetMesh("arrow"), (float)(Math.PI / 2), -1), EnumRenderStage.AfterBlit);
+                capi.Event.RegisterRenderer(new PointerRenderer(api as ICoreClientAPI, packet.position, GetMesh("arrow")), EnumRenderStage.AfterBlit);
             }
         }
     }
@@ -93,5 +123,15 @@ namespace harphoh.src.System
     public class HeyOverHereMessage
     {
         public Vec3d position;
+        public bool isBlockMarker;
+    }
+
+    [ProtoContract(ImplicitFields = ImplicitFields.AllPublic)]
+    public class HeyOverHereSender
+    {
+        public Vec3d playerPosition;
+        public bool isBlockMarker;
+        public float pitch;
+        public float yaw;
     }
 }

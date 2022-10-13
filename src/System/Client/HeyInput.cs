@@ -9,6 +9,7 @@ namespace harphoh.src.System.Client
     class HeyInput
     {
         const GlKeys heyKey = GlKeys.Minus;
+        const GlKeys heyKeyBlock = GlKeys.Plus;
         const float range = 64;
 
         ICoreAPI api;
@@ -27,30 +28,29 @@ namespace harphoh.src.System.Client
 
             ICoreClientAPI capi = api as ICoreClientAPI;
 
-            capi.Input.RegisterHotKey("heyoverhere", "Hey! Over Here!", heyKey);
+            capi.Input.RegisterHotKey("heyoverhere", "Hey! Over Here! Mark Position", heyKey);
             capi.Input.SetHotKeyHandler("heyoverhere", HeyOverHere);
-        }
 
-        bool EntityIgnore(Entity entity)
-        {
-            return false;
+            capi.Input.RegisterHotKey("heyoverhereblock", "Hey! Over Here! Mark Block", heyKeyBlock);
+            capi.Input.SetHotKeyHandler("heyoverhereblock", HeyOverHereBlock);
         }
 
         bool HeyOverHere(KeyCombination k)
         {
-            BlockSelection look = new BlockSelection();
-            EntitySelection ent = new EntitySelection();
+            Vec3d startPos = Player.Entity.SidedPos.XYZ;
+            startPos += Player.Entity.LocalEyePos;
 
-            api.World.RayTraceForSelection(Player.Entity.CameraPos, Player.CameraPitch, Player.Entity.BodyYaw, range, ref look, ref ent, null, new EntityFilter(EntityIgnore));
-            api.Logger.Chat(Player.Entity.Attributes.Values.ToString());
+            system.SendPacket(startPos, -Player.Entity.SidedPos.Pitch, Player.Entity.SidedPos.Yaw);
 
-            if (look == null) { return false; }
+            return true;
+        }
 
-            Vec3d selectTrue = look?.HitPosition + look?.Position.ToVec3d();
+        bool HeyOverHereBlock(KeyCombination k)
+        {
+            Vec3d startPos = Player.Entity.SidedPos.XYZ;
+            startPos += Player.Entity.LocalEyePos;
 
-            api.Logger.Chat("Position: (" + selectTrue.X + ", " + selectTrue.Y + ", " + selectTrue.Z + ")");
-
-            system.SendPacket(selectTrue);
+            system.SendPacket(startPos, -Player.Entity.SidedPos.Pitch, Player.Entity.SidedPos.Yaw, true);
 
             return true;
         }

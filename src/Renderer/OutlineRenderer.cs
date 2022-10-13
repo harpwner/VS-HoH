@@ -8,24 +8,20 @@ using Vintagestory.API.MathTools;
 
 namespace harphoh.src.Renderer
 {
-    class PointerRenderer : IRenderer
+    class OutlineRenderer : IRenderer
     {
         public Matrixf ModelMat = new Matrixf();
         const float dieTime = 10;
         float timeAlive = 0;
 
         ICoreClientAPI api;
-        float offset = 0;
-        int mult;
         Vec3d pos;
         MeshRef meshRef;
 
-        public PointerRenderer(ICoreClientAPI api, Vec3d pos, MeshData mesh, float offset = 0, int mult = 1)
+        public OutlineRenderer(ICoreClientAPI api, Vec3d pos, MeshData mesh)
         {
             this.api = api;
             this.pos = pos;
-            this.offset = offset;
-            this.mult = mult;
             meshRef = api.Render.UploadMesh(mesh);
         }
 
@@ -43,7 +39,7 @@ namespace harphoh.src.Renderer
         public void OnRenderFrame(float deltaTime, EnumRenderStage stage)
         {
             timeAlive += deltaTime;
-            if(timeAlive >= dieTime)
+            if (timeAlive >= dieTime)
             {
                 Dispose(); return;
             }
@@ -62,14 +58,10 @@ namespace harphoh.src.Renderer
             prog.ModelMatrix = ModelMat
                 .Identity()
                 .Translate(pos.X - camPos.X, pos.Y - camPos.Y, pos.Z - camPos.Z)
-                .Translate(0, 1 + (offset / 4) + (0.2f * Math.Sin(timeAlive * 4)), 0)
-                .Translate(0.5, 0.5, 0.5)
-                .RotateY(offset + (timeAlive * 2) * mult)
-                .Translate(-0.5, -0.5, -0.5)
                 .Values
             ;
 
-            prog.RgbaTint = new Vec4f(0.98f, 0.98f, 0, 0.8f);
+            prog.RgbaTint = new Vec4f(0.98f, 0.98f, 0, 0.5f + (float)(0.5f * Math.Sin(timeAlive * 8)));
             prog.ViewMatrix = rpi.CameraMatrixOriginf;
             prog.ProjectionMatrix = rpi.CurrentProjectionMatrix;
             rpi.RenderMesh(meshRef);

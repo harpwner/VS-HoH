@@ -1,9 +1,9 @@
 {
   "type": "code",
   "modid": "harphoh",
-  "name": "Hey Over Here!",
+  "name": "Hey, Over Here!",
   "authors": ["Harpwner"],
-  "description": "Look and place arrow numbnuts",
+  "description": "Hey! Over Here! Is a mod that allows you to mark positions or blocks for your friends. Now you can tell your friends about an incoming bear attack!",
   "version": "1.0.0",
   "dependencies": {
     "game": ""
