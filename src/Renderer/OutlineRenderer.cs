@@ -1,8 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using Vintagestory.API.Client;
 using Vintagestory.API.MathTools;
 
@@ -11,17 +7,18 @@ namespace harphoh.src.Renderer
     class OutlineRenderer : IRenderer
     {
         public Matrixf ModelMat = new Matrixf();
-        const float dieTime = 10;
         float timeAlive = 0;
 
         ICoreClientAPI api;
+        float decayTime;
         Vec3d pos;
         MeshRef meshRef;
 
-        public OutlineRenderer(ICoreClientAPI api, Vec3d pos, MeshData mesh)
+        public OutlineRenderer(ICoreClientAPI api, Vec3d pos, MeshData mesh, float decayTime)
         {
             this.api = api;
             this.pos = pos;
+            this.decayTime = decayTime;
             meshRef = api.Render.UploadMesh(mesh);
         }
 
@@ -39,7 +36,7 @@ namespace harphoh.src.Renderer
         public void OnRenderFrame(float deltaTime, EnumRenderStage stage)
         {
             timeAlive += deltaTime;
-            if (timeAlive >= dieTime)
+            if (timeAlive >= decayTime)
             {
                 Dispose(); return;
             }

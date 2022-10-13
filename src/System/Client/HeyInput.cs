@@ -1,19 +1,19 @@
-﻿using harphoh.src.Entities;
-using Vintagestory.API.Client;
+﻿using Vintagestory.API.Client;
 using Vintagestory.API.Common;
-using Vintagestory.API.Common.Entities;
 using Vintagestory.API.MathTools;
 
 namespace harphoh.src.System.Client
 {
     class HeyInput
     {
-        const GlKeys heyKey = GlKeys.Minus;
+        const GlKeys heyKeyArrow = GlKeys.Minus;
         const GlKeys heyKeyBlock = GlKeys.Plus;
-        const float range = 64;
+        const long cooldown = 10000;
 
-        ICoreAPI api;
         IClientPlayer Player => (api as ICoreClientAPI).World.Player;
+        ICoreAPI api;
+        bool canMark = true;
+        long markTime;
         HeySystem system;
 
         public HeyInput(ICoreAPI api, HeySystem system)
@@ -28,29 +28,50 @@ namespace harphoh.src.System.Client
 
             ICoreClientAPI capi = api as ICoreClientAPI;
 
-            capi.Input.RegisterHotKey("heyoverhere", "Hey! Over Here! Mark Position", heyKey);
-            capi.Input.SetHotKeyHandler("heyoverhere", HeyOverHere);
+            capi.Input.RegisterHotKey("heyoverherearrow", "Hey! Over Here! Mark Position", heyKeyArrow);
+            capi.Input.SetHotKeyHandler("heyoverherearrow", HeyOverHereArrow);
 
             capi.Input.RegisterHotKey("heyoverhereblock", "Hey! Over Here! Mark Block", heyKeyBlock);
             capi.Input.SetHotKeyHandler("heyoverhereblock", HeyOverHereBlock);
         }
 
-        bool HeyOverHere(KeyCombination k)
+        Vec3d GetEyePos()
         {
-            Vec3d startPos = Player.Entity.SidedPos.XYZ;
-            startPos += Player.Entity.LocalEyePos;
+            Vec3d eyePos = Player.Entity.SidedPos.XYZ;
+            eyePos += Player.Entity.LocalEyePos;
 
-            system.SendPacket(startPos, -Player.Entity.SidedPos.Pitch, Player.Entity.SidedPos.Yaw);
+            return eyePos;
+        }
+
+        void CheckTime()
+        {
+            this.canMark = api.World.ElapsedMilliseconds >= (markTime + cooldown);
+        }
+
+        bool HeyOverHereArrow(KeyCombination k)
+        {
+            CheckTime();
+
+            if (!canMark) { return false; }
+
+            system.SendPacket(GetEyePos(), -Player.Entity.SidedPos.Pitch, Player.Entity.SidedPos.Yaw);
+
+            canMark = false;
+            markTime = api.World.ElapsedMilliseconds;
 
             return true;
         }
 
         bool HeyOverHereBlock(KeyCombination k)
         {
-            Vec3d startPos = Player.Entity.SidedPos.XYZ;
-            startPos += Player.Entity.LocalEyePos;
+            CheckTime();
 
-            system.SendPacket(startPos, -Player.Entity.SidedPos.Pitch, Player.Entity.SidedPos.Yaw, true);
+            if (!canMark) { return false; }
+
+            system.SendPacket(GetEyePos(), -Player.Entity.SidedPos.Pitch, Player.Entity.SidedPos.Yaw, true);
+
+            canMark = false;
+            markTime = api.World.ElapsedMilliseconds;
 
             return true;
         }

@@ -1,15 +1,9 @@
-﻿using harphoh.src.Entities;
-using harphoh.src.System.Client;
+﻿using harphoh.src.System.Client;
 using harphoh.src.Renderer;
 using ProtoBuf;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using Vintagestory.API.Client;
 using Vintagestory.API.Common;
-using Vintagestory.API.Common.Entities;
 using Vintagestory.API.MathTools;
 using Vintagestory.API.Server;
 
@@ -18,6 +12,7 @@ namespace harphoh.src.System
     class HeySystem : ModSystem
     {
         HeyInput input;
+        const float decayTime = 10;
 
         ICoreAPI api;
         ICoreServerAPI sapi;
@@ -32,8 +27,6 @@ namespace harphoh.src.System
             input = new HeyInput(api, this);
 
             this.api = api;
-
-            api.RegisterEntity("EntityPointer", typeof(EntityPointer));
         }
 
         public override void StartClientSide(ICoreClientAPI api)
@@ -109,12 +102,12 @@ namespace harphoh.src.System
 
             if (packet.isBlockMarker)
             {
-                capi.Event.RegisterRenderer(new OutlineRenderer(api as ICoreClientAPI, packet.position, GetMesh("outline")), EnumRenderStage.AfterBlit);
+                capi.Event.RegisterRenderer(new OutlineRenderer(api as ICoreClientAPI, packet.position, GetMesh("outline"), decayTime), EnumRenderStage.AfterBlit);
             }
             else
             {
-                capi.Event.RegisterRenderer(new PointerRenderer(api as ICoreClientAPI, packet.position, GetMesh("arrow"), (float)(Math.PI / 2), -1), EnumRenderStage.AfterBlit);
-                capi.Event.RegisterRenderer(new PointerRenderer(api as ICoreClientAPI, packet.position, GetMesh("arrow")), EnumRenderStage.AfterBlit);
+                capi.Event.RegisterRenderer(new PointerRenderer(api as ICoreClientAPI, packet.position, GetMesh("arrow"), decayTime, (float)(Math.PI / 2), -1), EnumRenderStage.AfterBlit);
+                capi.Event.RegisterRenderer(new PointerRenderer(api as ICoreClientAPI, packet.position, GetMesh("arrow"), decayTime), EnumRenderStage.AfterBlit);
             }
         }
     }

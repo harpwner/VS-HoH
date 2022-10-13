@@ -1,8 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using Vintagestory.API.Client;
 using Vintagestory.API.MathTools;
 
@@ -11,21 +7,22 @@ namespace harphoh.src.Renderer
     class PointerRenderer : IRenderer
     {
         public Matrixf ModelMat = new Matrixf();
-        const float dieTime = 10;
         float timeAlive = 0;
+        float offset = 0;
 
         ICoreClientAPI api;
-        float offset = 0;
+        float decayTime;
         int mult;
         Vec3d pos;
         MeshRef meshRef;
 
-        public PointerRenderer(ICoreClientAPI api, Vec3d pos, MeshData mesh, float offset = 0, int mult = 1)
+        public PointerRenderer(ICoreClientAPI api, Vec3d pos, MeshData mesh, float decayTime, float offset = 0, int mult = 1)
         {
             this.api = api;
             this.pos = pos;
             this.offset = offset;
             this.mult = mult;
+            this.decayTime = decayTime;
             meshRef = api.Render.UploadMesh(mesh);
         }
 
@@ -43,7 +40,7 @@ namespace harphoh.src.Renderer
         public void OnRenderFrame(float deltaTime, EnumRenderStage stage)
         {
             timeAlive += deltaTime;
-            if(timeAlive >= dieTime)
+            if(timeAlive >= decayTime)
             {
                 Dispose(); return;
             }
