@@ -2,3 +2,7 @@ bin
 obj
 releases
 .vs
+*.pbd
+*.dll
+*.csproj
+.ignore
