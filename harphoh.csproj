@@ -69,12 +69,12 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="src\Entities\EntityPointer.cs" />
+    <Compile Include="src\Renderer\PointerRenderer.cs" />
     <Compile Include="src\System\Client\HeyInput.cs" />
     <Compile Include="src\System\HeySystem.cs" />
   </ItemGroup>
   <ItemGroup />
   <ItemGroup>
-    <None Include="assets\entities\arrow.json" />
     <None Include="assets\entities\arrowpointer.json" />
     <None Include="assets\shapes\entity\arrow.json" />
   </ItemGroup>

@@ -17,9 +17,10 @@ namespace harphoh.src.System
     class HeySystem : ModSystem
     {
         HeyInput input;
+
         ICoreAPI api;
-        ICoreServerAPI serverAPI;
-        ICoreClientAPI clientAPI;
+        ICoreServerAPI sapi;
+        ICoreClientAPI capi;
         IServerNetworkChannel serverChannel;
         IClientNetworkChannel clientChannel;
 
@@ -38,9 +39,9 @@ namespace harphoh.src.System
         {
             base.StartClientSide(api);
 
-            this.clientAPI = api;
+            this.capi = api;
 
-            clientChannel = clientAPI.Network.RegisterChannel("heyoverhere")
+            clientChannel = capi.Network.RegisterChannel("heyoverhere")
                 .RegisterMessageType(typeof(HeyOverHereMessage));
         }
 
@@ -48,9 +49,9 @@ namespace harphoh.src.System
         {
             base.StartServerSide(api);
 
-            this.serverAPI = api;
+            this.sapi = api;
 
-            serverChannel = serverAPI.Network.RegisterChannel("heyoverhere")
+            serverChannel = sapi.Network.RegisterChannel("heyoverhere")
                 .RegisterMessageType(typeof(HeyOverHereMessage))
                 .SetMessageHandler<HeyOverHereMessage>(SpawnArrow);
         }
@@ -70,9 +71,9 @@ namespace harphoh.src.System
 
             Vec3d position = packet.position;
 
-            AssetLocation asset = AssetLocation.Create("harphoh:arrow");
+            //AssetLocation asset = new AssetLocation("harphoh:entities/arrowpointer");
 
-            EntityProperties type = api.World.GetEntityType(asset);
+            EntityProperties type = api.World.GetEntityType(new AssetLocation("harphoh:arrowpointer"));
 
             Entity entity = api.ClassRegistry.CreateEntity(type);
 

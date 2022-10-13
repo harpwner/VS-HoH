@@ -1,9 +1,9 @@
 {
   "type": "code",
   "modid": "harphoh",
-  "name": "harphoh",
-  "authors": ["Unknown"],
-  "description": "To be added",
+  "name": "Hey Over Here!",
+  "authors": ["Harpwner"],
+  "description": "Look and place arrow numbnuts",
   "version": "1.0.0",
   "dependencies": {
     "game": ""

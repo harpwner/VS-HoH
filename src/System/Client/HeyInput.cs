@@ -8,11 +8,12 @@ namespace harphoh.src.System.Client
 {
     class HeyInput
     {
+        const GlKeys heyKey = GlKeys.Minus;
+        const float range = 64;
+
         ICoreAPI api;
         IClientPlayer Player => (api as ICoreClientAPI).World.Player;
         HeySystem system;
-        const GlKeys heyKey = GlKeys.Minus;
-        const float range = 64;
 
         public HeyInput(ICoreAPI api, HeySystem system)
         {
@@ -30,11 +31,17 @@ namespace harphoh.src.System.Client
             capi.Input.SetHotKeyHandler("heyoverhere", HeyOverHere);
         }
 
+        bool EntityIgnore(Entity entity)
+        {
+            return false;
+        }
+
         bool HeyOverHere(KeyCombination k)
         {
             BlockSelection look = new BlockSelection();
             EntitySelection ent = new EntitySelection();
-            api.World.RayTraceForSelection(Player.Entity.CameraPos, Player.CameraPitch, Player.Entity.BodyYaw, range, ref look, ref ent);
+
+            api.World.RayTraceForSelection(Player.Entity.CameraPos, Player.CameraPitch, Player.Entity.BodyYaw, range, ref look, ref ent, null, new EntityFilter(EntityIgnore));
             api.Logger.Chat(Player.Entity.Attributes.Values.ToString());
 
             if (look == null) { return false; }
