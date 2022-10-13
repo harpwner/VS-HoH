@@ -72,8 +72,10 @@ namespace harphoh.src.System
         {
             if(api.Side != EnumAppSide.Client) { return; }
 
-            api.Logger.Chat("Sending message");
+            api.Logger.Debug("Sending message to server");
+
             HeyOverHereSender message = new HeyOverHereSender() { playerPosition = playerPos, pitch = pitch, yaw = yaw, isBlockMarker = isBlockMarker };
+
             clientChannel.SendPacket(message);
         }
 
@@ -81,7 +83,7 @@ namespace harphoh.src.System
         {
             if (api.Side != EnumAppSide.Server) { return; }
 
-            api.Logger.Chat("Server Receieved Message! Forming HoH Packet");
+            api.Logger.Debug("Server recieved meessage! Forming HoH Packet");
 
             BlockSelection bSelection = new BlockSelection();
             EntitySelection eSelection = new EntitySelection();
@@ -98,7 +100,8 @@ namespace harphoh.src.System
         void SpawnArrow(HeyOverHereMessage packet)
         {
             if(api.Side != EnumAppSide.Client) { return; }
-            api.Logger.Chat("Packet Receieved From Server, Spawning HoH Arrow!");
+
+            api.Logger.Debug("Packet received from server, Spawning HoH Arrow!");
 
             if (packet.isBlockMarker)
             {
