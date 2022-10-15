@@ -3,7 +3,7 @@
     "class": "Block",
     "shape": { "base": "game:block/basic/nothing" },
     "textures": {
-        "gold": { "base": "game:block/metal/plate/gold" }
+        "gold": { "base": "harphoh:ref/blank" }
     },
     "drops": []
 }

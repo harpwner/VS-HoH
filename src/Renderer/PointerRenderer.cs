@@ -53,7 +53,7 @@ namespace harphoh.src.Renderer
             rpi.GlDisableCullFace();
             rpi.GlToggleBlend(true);
 
-            IStandardShaderProgram prog = rpi.PreparedStandardShader(0, 2048, 0, new Vec4f(255, 255, 255, 255));
+            IStandardShaderProgram prog = rpi.PreparedStandardShader((int)pos.X, 0, (int)pos.Z, new Vec4f(200, 200, 200, 200));
             prog.Tex2D = api.BlockTextureAtlas.AtlasTextureIds[0];
 
             prog.ModelMatrix = ModelMat
@@ -66,7 +66,7 @@ namespace harphoh.src.Renderer
                 .Values
             ;
 
-            prog.RgbaTint = new Vec4f(0.9f, 0.9f, 0, 1);
+            prog.RgbaTint = new Vec4f(0.9f, 0.8f, 0.2f, 1);
             prog.ViewMatrix = rpi.CameraMatrixOriginf;
             prog.ProjectionMatrix = rpi.CurrentProjectionMatrix;
             rpi.RenderMesh(meshRef);
