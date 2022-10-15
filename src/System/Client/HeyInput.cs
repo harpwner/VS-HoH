@@ -8,7 +8,7 @@ namespace harphoh.src.System.Client
     {
         const GlKeys heyKeyArrow = GlKeys.Minus;
         const GlKeys heyKeyBlock = GlKeys.Plus;
-        const long cooldown = 10000;
+        const long cooldown = 100;
 
         IClientPlayer Player => (api as ICoreClientAPI).World.Player;
         ICoreAPI api;
@@ -35,6 +35,8 @@ namespace harphoh.src.System.Client
             capi.Input.SetHotKeyHandler("heyoverhereblock", HeyOverHereBlock);
         }
 
+        /// <summary>Gets the eye position of the player in real world space</summary>
+        /// <returns>player eye position in world space</returns>
         Vec3d GetEyePos()
         {
             Vec3d eyePos = Player.Entity.SidedPos.XYZ;
@@ -43,6 +45,7 @@ namespace harphoh.src.System.Client
             return eyePos;
         }
 
+        /// <summary>Called to check to see if a pointer can be placed. If the pointer is not on cooldown, the canMark variable is set to true</summary>
         void CheckTime()
         {
             this.canMark = api.World.ElapsedMilliseconds >= (markTime + cooldown);

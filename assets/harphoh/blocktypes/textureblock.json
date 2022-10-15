@@ -1,0 +1,9 @@
+﻿{
+    "code": "texblock",
+    "class": "Block",
+    "shape": { "base": "game:block/basic/nothing" },
+    "textures": {
+        "gold": { "base": "game:block/metal/plate/gold" }
+    },
+    "drops": []
+}
